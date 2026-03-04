@@ -2431,6 +2431,8 @@ select {
   margin: 0 auto;
   padding: 12px 24px;
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 24px;
 }

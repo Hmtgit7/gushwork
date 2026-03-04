@@ -29,51 +29,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ==============================================
    0. PRICE STICKY BAR
-   Appears when the versatile section enters the viewport
-   (meaning the hero price-box has scrolled out of view).
-   Hides again when the footer scrolls into view.
+   Shows when the hero .price-box has scrolled above the viewport
+   (i.e. the user is past the hero section).
+   Hides again when the footer becomes visible.
    ============================================== */
 function initPriceStickyBar() {
   const bar = document.getElementById("price-sticky-bar");
-  const versatileSection = document.querySelector(".versatile-section");
+  const priceBox = document.querySelector(".price-box");
   const footer = document.querySelector(".footer");
-  if (!bar || !versatileSection) return;
+  if (!bar || !priceBox) return;
 
-  // Use IntersectionObserver so the bar shows/hides exactly when
-  // the Versatile Applications section enters / exits the viewport.
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.target === versatileSection) {
-          if (entry.isIntersecting) {
-            bar.classList.add("price-sticky-bar--visible");
-            bar.removeAttribute("aria-hidden");
-          } else {
-            // Only hide if scrolled ABOVE the section (not yet reached)
-            if (window.scrollY < versatileSection.offsetTop) {
-              bar.classList.remove("price-sticky-bar--visible");
-              bar.setAttribute("aria-hidden", "true");
-            }
-          }
-        }
-        if (entry.target === footer) {
-          // Footer is visible: hide the bar
-          if (entry.isIntersecting) {
-            bar.classList.remove("price-sticky-bar--visible");
-            bar.setAttribute("aria-hidden", "true");
-          }
-        }
-      });
-    },
-    { threshold: 0.05 },
-  );
+  function updateBar() {
+    const priceBoxRect = priceBox.getBoundingClientRect();
+    const footerRect = footer ? footer.getBoundingClientRect() : null;
 
-  observer.observe(versatileSection);
-  if (footer) observer.observe(footer);
+    // Show when hero price-box has fully scrolled above viewport top
+    const priceBoxGone = priceBoxRect.bottom < 0;
+    // Hide when footer top edge enters the viewport
+    const footerVisible = footerRect ? footerRect.top < window.innerHeight : false;
+
+    if (priceBoxGone && !footerVisible) {
+      bar.classList.add("price-sticky-bar--visible");
+      bar.removeAttribute("aria-hidden");
+    } else {
+      bar.classList.remove("price-sticky-bar--visible");
+      bar.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  window.addEventListener("scroll", updateBar, { passive: true });
+  // Run once on load in case page is opened mid-scroll (e.g. browser back)
+  updateBar();
 
   // ---- Wire up CTA buttons inside the bar ----
-  // \"View Technical Specs\" → smooth-scroll to specs section
-  // (\"Get Custom Quote\" is already wired by initModals via .btn-primary selector)
+  // "View Technical Specs" → smooth-scroll to specs section
+  // ("Get Custom Quote" is already picked up by initModals via .btn-primary + text match)
   const specsBtnInBar = bar.querySelector(".price-sticky-bar__btn-outline");
   if (specsBtnInBar) {
     specsBtnInBar.addEventListener("click", () => {
