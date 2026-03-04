@@ -1309,6 +1309,164 @@
       <div class="magnifier-cursor" id="magnifier-cursor" aria-hidden="true">
         <img src="./Assets/icon-magnifier.svg" alt="" />
       </div>
+
+      <!-- =============================================
+       BROCHURE / CATALOGUE MODAL
+       Triggered by: Download PDF buttons, Download Full Technical Datasheet,
+                     Request Catalogue button
+       ============================================= -->
+      <div
+        class="modal-backdrop"
+        id="brochure-modal-backdrop"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="brochure-modal-title"
+        aria-hidden="true"
+      >
+        <div class="modal" id="brochure-modal">
+          <div class="modal-header">
+            <h2 class="modal-title" id="brochure-modal-title">
+              Let us email the entire catalogue to you
+            </h2>
+            <button
+              class="modal-close-btn"
+              id="brochure-modal-close"
+              type="button"
+              aria-label="Close modal"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M12 4L4 12M4 4l8 8" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <form class="modal-form" id="brochure-form" novalidate>
+            <div class="modal-field">
+              <label class="modal-label" for="brochure-email">
+                Your Email <span class="modal-required">*</span>
+              </label>
+              <input
+                id="brochure-email"
+                type="email"
+                name="email"
+                class="modal-input"
+                placeholder="example@gmail.com"
+                autocomplete="email"
+                required
+              />
+            </div>
+            <div class="modal-field">
+              <label class="modal-label" for="brochure-contact">
+                Your Contact <span class="modal-optional">(Optional)</span>
+              </label>
+              <input
+                id="brochure-contact"
+                type="tel"
+                name="contact"
+                class="modal-input"
+                placeholder="+91-0000000000"
+                autocomplete="tel"
+              />
+            </div>
+            <div class="modal-footer">
+              <button
+                class="btn-modal-submit"
+                id="brochure-submit"
+                type="submit"
+                disabled
+              >
+                Download Brochure
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- =============================================
+       CALL BACK MODAL
+       Triggered by: "Get Custom Quote", "Request a Quote", "Talk to an Expert"
+       ============================================= -->
+      <div
+        class="modal-backdrop"
+        id="quote-modal-backdrop"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="quote-modal-title"
+        aria-hidden="true"
+      >
+        <div class="modal" id="quote-modal">
+          <div class="modal-header">
+            <h2 class="modal-title" id="quote-modal-title">
+              Request a call back
+            </h2>
+            <button
+              class="modal-close-btn"
+              id="quote-modal-close"
+              type="button"
+              aria-label="Close modal"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M12 4L4 12M4 4l8 8" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <form class="modal-form" id="quote-form" novalidate>
+            <input
+              id="quote-name"
+              type="text"
+              name="fullName"
+              class="modal-input"
+              placeholder="Full Name"
+              autocomplete="name"
+              required
+            />
+            <input
+              id="quote-company"
+              type="text"
+              name="companyName"
+              class="modal-input"
+              placeholder="Company Name"
+              autocomplete="organization"
+            />
+            <input
+              id="quote-email"
+              type="email"
+              name="email"
+              class="modal-input"
+              placeholder="Email Address"
+              autocomplete="email"
+              required
+            />
+            <div class="modal-phone-row">
+              <select class="modal-phone-select" name="countryCode" aria-label="Country code">
+                <option value="+91">+91</option>
+                <option value="+1">+1</option>
+                <option value="+44">+44</option>
+                <option value="+61">+61</option>
+                <option value="+971">+971</option>
+              </select>
+              <input
+                id="quote-phone"
+                type="tel"
+                name="phone"
+                class="modal-input modal-phone-input"
+                placeholder="7003026616"
+                autocomplete="tel"
+              />
+            </div>
+            <div class="modal-footer">
+              <button
+                class="btn-modal-submit"
+                id="quote-submit"
+                type="submit"
+                disabled
+              >
+                Submit Form
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
     </div>
     <!-- end #app-root -->
     <script src="./JS/script.js"></script>

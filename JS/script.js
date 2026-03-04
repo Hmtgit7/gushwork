@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initVersatile();
   initTestimonials();
   initContactForm();
+  initModals();
 });
 
 /* ==============================================
@@ -534,4 +535,238 @@ function initContactForm() {
       btn.style.background = "";
     }, 3000);
   });
+}
+
+/* ==============================================
+   9. MODALS
+   Two modals:
+   - Brochure modal  (#brochure-modal-backdrop)
+   - Custom Quote modal (#quote-modal-backdrop)
+   ============================================== */
+function initModals() {
+
+  /* ---- Generic modal helpers ---- */
+  function openModal(backdropId) {
+    const backdrop = document.getElementById(backdropId);
+    if (!backdrop) return;
+    backdrop.classList.add("modal--open");
+    backdrop.removeAttribute("aria-hidden");
+    document.body.style.overflow = "hidden";
+    // Focus first focusable element for accessibility
+    const firstInput = backdrop.querySelector("input, textarea, button");
+    if (firstInput) setTimeout(() => firstInput.focus(), 50);
+  }
+
+  function closeModal(backdropId) {
+    const backdrop = document.getElementById(backdropId);
+    if (!backdrop) return;
+    backdrop.classList.remove("modal--open");
+    backdrop.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  function closeAllModals() {
+    closeModal("brochure-modal-backdrop");
+    closeModal("quote-modal-backdrop");
+  }
+
+  // Close on backdrop click (not the modal card itself)
+  ["brochure-modal-backdrop", "quote-modal-backdrop"].forEach((id) => {
+    const backdrop = document.getElementById(id);
+    if (!backdrop) return;
+    backdrop.addEventListener("click", (e) => {
+      if (e.target === backdrop) closeModal(id);
+    });
+  });
+
+  // Close on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAllModals();
+  });
+
+  // ---- Brochure modal close button ----
+  const brochureClose = document.getElementById("brochure-modal-close");
+  if (brochureClose)
+    brochureClose.addEventListener("click", () =>
+      closeModal("brochure-modal-backdrop")
+    );
+
+  // ---- Quote modal close button ----
+  const quoteClose = document.getElementById("quote-modal-close");
+  if (quoteClose)
+    quoteClose.addEventListener("click", () =>
+      closeModal("quote-modal-backdrop")
+    );
+
+  /* ---- TRIGGER BUTTONS: Brochure modal ---- */
+  // 1. "Download Full Technical Datasheet" in Specs section
+  // 2. All "Download PDF" buttons in Resources section
+  // 3. "Request Catalogue" button in FAQ catalogue box
+  function attachBrochureTrigger(el) {
+    if (!el) return;
+    el.addEventListener("click", () => openModal("brochure-modal-backdrop"));
+  }
+
+  // Download Full Technical Datasheet button
+  document.querySelectorAll(".btn-outline-white").forEach((btn) => {
+    if (btn.textContent.trim().includes("Download Full Technical Datasheet")) {
+      attachBrochureTrigger(btn);
+    }
+  });
+
+  // All "Download PDF" resource buttons
+  document.querySelectorAll(".resource-btn").forEach(attachBrochureTrigger);
+
+  // "Request Catalogue" button in FAQ catalogue box
+  document.querySelectorAll(".btn-primary").forEach((btn) => {
+    if (btn.textContent.trim() === "Request Catalogue") {
+      attachBrochureTrigger(btn);
+    }
+  });
+
+  /* ---- TRIGGER BUTTONS: Quote modal ---- */
+  // 1. "Get Custom Quote" buttons (hero & sticky header area)
+  // 2. "Request a Quote" button in Features section
+  // 3. "Talk to an Expert" button in Solutions CTA
+  function attachQuoteTrigger(el) {
+    if (!el) return;
+    el.addEventListener("click", () => openModal("quote-modal-backdrop"));
+  }
+
+  document.querySelectorAll(".btn-primary").forEach((btn) => {
+    const text = btn.textContent.trim();
+    if (
+      text === "Get Custom Quote" ||
+      text === "Request a Quote" ||
+      text.includes("Talk to an Expert")
+    ) {
+      attachQuoteTrigger(btn);
+    }
+  });
+
+  /* ---- Brochure form: enable submit when email is valid ---- */
+  const brochureEmailInput = document.getElementById("brochure-email");
+  const brochureSubmit = document.getElementById("brochure-submit");
+
+  function validateBrochureForm() {
+    if (!brochureEmailInput || !brochureSubmit) return;
+    const val = brochureEmailInput.value.trim();
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    brochureSubmit.disabled = !valid;
+  }
+
+  if (brochureEmailInput) {
+    brochureEmailInput.addEventListener("input", validateBrochureForm);
+  }
+
+  /* ---- Brochure form submit ---- */
+  const brochureForm = document.getElementById("brochure-form");
+  if (brochureForm) {
+    brochureForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const modalCard = document.getElementById("brochure-modal");
+      if (!modalCard) return;
+
+      // Replace form content with success message
+      const formEl = modalCard.querySelector(".modal-form");
+      const header = modalCard.querySelector(".modal-header");
+      if (formEl) formEl.style.display = "none";
+      if (header) header.style.display = "none";
+
+      // Remove existing success if any
+      const existing = modalCard.querySelector(".modal-success");
+      if (existing) existing.remove();
+
+      const success = document.createElement("div");
+      success.className = "modal-success";
+      success.innerHTML = `
+        <div class="modal-success-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M6 14l6 6 10-10" stroke="#16a34a" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="modal-success-title">Check Your Inbox!</p>
+        <p class="modal-success-desc">
+          We've sent the catalogue to your email address. It should arrive within a few minutes.
+        </p>
+      `;
+      modalCard.appendChild(success);
+
+      setTimeout(() => {
+        closeModal("brochure-modal-backdrop");
+        // Restore after animation
+        setTimeout(() => {
+          if (formEl) formEl.style.display = "";
+          if (header) header.style.display = "";
+          success.remove();
+          brochureForm.reset();
+          if (brochureSubmit) brochureSubmit.disabled = true;
+        }, 350);
+      }, 2800);
+    });
+  }
+
+  /* ---- Quote form: enable submit when name + email are valid ---- */
+  const quoteNameInput = document.getElementById("quote-name");
+  const quoteEmailInput = document.getElementById("quote-email");
+  const quoteSubmit = document.getElementById("quote-submit");
+
+  function validateQuoteForm() {
+    if (!quoteNameInput || !quoteEmailInput || !quoteSubmit) return;
+    const nameOk = quoteNameInput.value.trim().length > 0;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+      quoteEmailInput.value.trim()
+    );
+    quoteSubmit.disabled = !(nameOk && emailOk);
+  }
+
+  [quoteNameInput, quoteEmailInput].forEach((el) => {
+    if (el) el.addEventListener("input", validateQuoteForm);
+  });
+
+  /* ---- Quote form submit ---- */
+  const quoteForm = document.getElementById("quote-form");
+  if (quoteForm) {
+    quoteForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const modalCard = document.getElementById("quote-modal");
+      if (!modalCard) return;
+
+      const formEl = modalCard.querySelector(".modal-form");
+      const header = modalCard.querySelector(".modal-header");
+      if (formEl) formEl.style.display = "none";
+      if (header) header.style.display = "none";
+
+      const existing = modalCard.querySelector(".modal-success");
+      if (existing) existing.remove();
+
+      const success = document.createElement("div");
+      success.className = "modal-success";
+      success.innerHTML = `
+        <div class="modal-success-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M6 14l6 6 10-10" stroke="#16a34a" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="modal-success-title">We'll Call You Back!</p>
+        <p class="modal-success-desc">
+          Our team will reach out to you shortly.
+        </p>
+      `;
+      modalCard.appendChild(success);
+
+      setTimeout(() => {
+        closeModal("quote-modal-backdrop");
+        setTimeout(() => {
+          if (formEl) formEl.style.display = "";
+          if (header) header.style.display = "";
+          success.remove();
+          quoteForm.reset();
+          if (quoteSubmit) quoteSubmit.disabled = true;
+        }, 350);
+      }, 2800);
+    });
+  }
 }
