@@ -24,7 +24,66 @@ document.addEventListener("DOMContentLoaded", () => {
   initTestimonials();
   initContactForm();
   initModals();
+  initPriceStickyBar();
 });
+
+/* ==============================================
+   0. PRICE STICKY BAR
+   Appears when the versatile section enters the viewport
+   (meaning the hero price-box has scrolled out of view).
+   Hides again when the footer scrolls into view.
+   ============================================== */
+function initPriceStickyBar() {
+  const bar = document.getElementById("price-sticky-bar");
+  const versatileSection = document.querySelector(".versatile-section");
+  const footer = document.querySelector(".footer");
+  if (!bar || !versatileSection) return;
+
+  // Use IntersectionObserver so the bar shows/hides exactly when
+  // the Versatile Applications section enters / exits the viewport.
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.target === versatileSection) {
+          if (entry.isIntersecting) {
+            bar.classList.add("price-sticky-bar--visible");
+            bar.removeAttribute("aria-hidden");
+          } else {
+            // Only hide if scrolled ABOVE the section (not yet reached)
+            if (window.scrollY < versatileSection.offsetTop) {
+              bar.classList.remove("price-sticky-bar--visible");
+              bar.setAttribute("aria-hidden", "true");
+            }
+          }
+        }
+        if (entry.target === footer) {
+          // Footer is visible: hide the bar
+          if (entry.isIntersecting) {
+            bar.classList.remove("price-sticky-bar--visible");
+            bar.setAttribute("aria-hidden", "true");
+          }
+        }
+      });
+    },
+    { threshold: 0.05 },
+  );
+
+  observer.observe(versatileSection);
+  if (footer) observer.observe(footer);
+
+  // ---- Wire up CTA buttons inside the bar ----
+  // \"View Technical Specs\" → smooth-scroll to specs section
+  // (\"Get Custom Quote\" is already wired by initModals via .btn-primary selector)
+  const specsBtnInBar = bar.querySelector(".price-sticky-bar__btn-outline");
+  if (specsBtnInBar) {
+    specsBtnInBar.addEventListener("click", () => {
+      const specsSection = document.querySelector(".specs-section");
+      if (specsSection) {
+        specsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
+}
 
 /* ==============================================
    1. STICKY HEADER
